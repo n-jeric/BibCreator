@@ -1,12 +1,10 @@
 // The main task of this tool is read and process a given .bib file (which has one or more articles) and create 3
 //different files with the correct reference formats for IEEE, ACM and NJ.
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 
 
 public class BibCreator {
@@ -20,6 +18,7 @@ public class BibCreator {
         System.out.println("===================Welcome to BibCreator===================\n");
         Scanner scanner = new Scanner(System.in);
         Scanner sc = null;
+        PrintWriter pw = null;
 
         dirPath =  setBibDirectory (scanner);
 
@@ -51,6 +50,16 @@ public class BibCreator {
             }
         }
 
+        String outputPath = setOutputDirectory(scanner, dirPath);
+        //tests output path method
+        try {
+            pw = new PrintWriter(new FileOutputStream(outputPath+ "jimmy.txt"));
+            pw.close();
+        } catch (FileNotFoundException e) {
+            pw.close();
+            throw new RuntimeException(e);
+
+        }
         scanner.close();
     }
     public static String setBibDirectory (Scanner scanner){
@@ -107,7 +116,7 @@ public class BibCreator {
                 fileArr[i][0] = fileList.get(i).substring(0, 5);
 
                 //String remainder = fileList.get(i).substring(5);
-                String[] parts = fileList.get(i).substring(5).split("\\.(?=[^.]*$)");
+                String[] parts = fileList.get(i).substring(5).split("\\.(?=[^.]*$)");//regex positive lookahead - to ensure it only splits on the last occurrence
 
                 fileArr[i][1] = parts[0];
                 fileArr[i][2] = "."+parts[1];
@@ -121,5 +130,46 @@ public class BibCreator {
             }
         }
     }
+    public static String setOutputDirectory (Scanner scanner, String dirPath){
+        String outputPath;
+        System.out.println("Default Directory to save .json files = " + System.getProperty("user.dir"));
 
+        if(dirPath.equals(System.getProperty("user.dir"))){
+            System.out.print("Would you like to enter a different directory? (y/n) ");
+            char ans = scanner.next().toLowerCase().charAt(0);
+            scanner.nextLine();
+
+            if(ans == 'y'){
+                System.out.print("Enter directory path: ");
+                outputPath = scanner.nextLine();
+            }
+            else {
+                outputPath = System.getProperty("user.dir");
+            }
+        }
+        else{
+            System.out.print("Would you like to use the current .bib file directory at "+ dirPath + "? (y/n) ");
+            char ans = scanner.next().toLowerCase().charAt(0);
+            scanner.nextLine();
+
+            if(ans == 'y'){
+                outputPath = dirPath;
+            }
+            else {
+                System.out.print("Would you like to enter a different directory? (y/n) ");
+                ans = scanner.next().toLowerCase().charAt(0);
+                scanner.nextLine();
+
+                if(ans == 'y'){
+                    System.out.print("Enter directory path: ");
+                    outputPath = scanner.nextLine();
+                }
+                else {
+                    outputPath = System.getProperty("user.dir");
+                }
+            }
+        }
+        outputPath += "\\";
+        return outputPath;
+    }
 }
