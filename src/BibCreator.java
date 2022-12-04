@@ -13,7 +13,7 @@ public class BibCreator {
 
 
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        System.out.println("===================Welcome to BibCreator!===================\n");
+        System.out.println("===================Welcome to BibCreator===================\n");
         Scanner scanner = new Scanner(System.in);
 
         String dirPath = System.getProperty("user.dir");
@@ -28,8 +28,18 @@ public class BibCreator {
 
         List<String> fileList = new ArrayList<>();
         getBibFiles(dirPath, fileList);
+
         System.out.println(fileList);
 
+        String[][] fileArr = new String[fileList.size()][3];
+
+        splitBibFileName(fileList, fileArr);
+        for (String[] strings : fileArr) {
+            for (String string : strings) {
+                System.out.print(string + " ");
+            }
+            System.out.println();
+        }
 
 
 
@@ -59,4 +69,32 @@ public class BibCreator {
         int strOffset = str.length() - suffix.length();
         return str.regionMatches(ignoreCase, strOffset, suffix, 0, suffix.length());
     }
+    public static boolean startsWithIgnoreCase(String str, String prefix) {
+        return str.regionMatches(true, 0, prefix, 0, prefix.length());
+    }
+    public static void splitBibFileName(List<String> fileList, String[][] fileArr){
+
+        String start = "Latex";
+        for (int i = 0; i < fileList.size(); i++) {
+
+            if(startsWithIgnoreCase(fileList.get(i), start)) {
+
+                fileArr[i][0] = fileList.get(i).substring(0, 5);
+
+                //String remainder = fileList.get(i).substring(5);
+                String[] parts = fileList.get(i).substring(5).split("\\.(?=[^.]*$)");
+
+                fileArr[i][1] = parts[0];
+                fileArr[i][2] = "."+parts[1];
+            }
+            else{
+                fileArr[i][0] = "";
+                String[] parts = fileList.get(i).split("\\.(?=[^.]*$)");
+
+                fileArr[i][1] = parts[0];
+                fileArr[i][2] = "."+parts[1];
+            }
+        }
+    }
+
 }
