@@ -19,7 +19,7 @@ public class BibCreator {
 
         System.out.println("===================Welcome to BibCreator===================\n");
         Scanner scanner = new Scanner(System.in);
-
+        Scanner sc = null;
 
         dirPath =  setBibDirectory (scanner);
 
@@ -37,7 +37,19 @@ public class BibCreator {
             }
             System.out.println();
         }
-
+        //open all .bib files in directory
+        for (String[] strings : fileArr) {
+            try {
+                sc = new Scanner(new FileInputStream(strings[0] + strings[1] + strings[2]));
+                sc.close();
+            }
+            catch (FileNotFoundException e) //if file does not exist
+            {
+                sc.close(); //close any opened files
+                System.out.println("Could not open input file " + strings[0] + strings[1] + strings[2] + " for reading.\n\nPlease check if file exists! Program will terminate after closing any opened files.");
+                System.exit(0);
+            }
+        }
 
         scanner.close();
     }
