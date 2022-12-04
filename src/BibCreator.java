@@ -1,51 +1,64 @@
 // The main task of this tool is read and process a given .bib file (which has one or more articles) and create 3
 //different files with the correct reference formats for IEEE, ACM and NJ.
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.io.File;
 
 
 public class BibCreator {
 
     public static void main(String[] args) {
 
+        String dirPath;
+        List<String> fileList;
+        String[][] fileArr;
 
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println("===================Welcome to BibCreator===================\n");
         Scanner scanner = new Scanner(System.in);
 
-        String dirPath = System.getProperty("user.dir");
-//        mini switch
-//        optional string input
-//                dirPath = input
 
-//        File dir = new File(dirPath);
-//        File[] fileList = dir.listFiles();
-//        File[] fileList1 = new File(dirPath).listFiles();
+        dirPath =  setBibDirectory (scanner);
 
-
-        List<String> fileList = new ArrayList<>();
+        fileList = new ArrayList<>();
         getBibFiles(dirPath, fileList);
 
         System.out.println(fileList);
 
-        String[][] fileArr = new String[fileList.size()][3];
-
+        fileArr = new String[fileList.size()][3];
         splitBibFileName(fileList, fileArr);
+
         for (String[] strings : fileArr) {
             for (String string : strings) {
-                System.out.print(string + " ");
+                System.out.print(string);
             }
             System.out.println();
         }
 
 
-
+        scanner.close();
     }
+    public static String setBibDirectory (Scanner scanner){
+        String dirPath;
+        System.out.println("Working Directory for .bib files = " + System.getProperty("user.dir"));
 
-    private static void getBibFiles(String dirPath, List<String> bibFileList) {
+        System.out.print("Would you like to enter a different directory? (y/n) ");
+        char ans = scanner.next().toLowerCase().charAt(0);
+        scanner.nextLine();
+
+        if(ans == 'y'){
+            System.out.print("Enter directory path: ");
+            dirPath = scanner.nextLine();
+        }
+        else {
+            dirPath = System.getProperty("user.dir");
+        }
+        return dirPath;
+    }
+    public static void getBibFiles(String dirPath, List<String> bibFileList) {
         File[] allFiles = new File(dirPath).listFiles();
 
         if (allFiles != null) {
