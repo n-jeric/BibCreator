@@ -39,27 +39,28 @@ public class BibCreator {
         //open all .bib files in directory
         for (String[] strings : fileArr) {
             try {
-                sc = new Scanner(new FileInputStream(strings[0] + strings[1] + strings[2]));
+                sc = new Scanner(new FileInputStream(dirPath +"/"+ strings[0] + strings[1] + strings[2]));
                 sc.close();
             }
             catch (FileNotFoundException e) //if file does not exist
             {
-                sc.close(); //close any opened files
                 System.out.println("Could not open input file " + strings[0] + strings[1] + strings[2] + " for reading.\n\nPlease check if file exists! Program will terminate after closing any opened files.");
+                sc.close(); //close any opened files
                 System.exit(0);
             }
         }
 
         String outputPath = setOutputDirectory(scanner, dirPath);
-        //tests output path method
-        try {
-            pw = new PrintWriter(new FileOutputStream(outputPath+ "jimmy.txt"));
-            pw.close();
-        } catch (FileNotFoundException e) {
-            pw.close();
-            throw new RuntimeException(e);
 
-        }
+        //tests output path method
+//        try {
+//            pw = new PrintWriter(new FileOutputStream(outputPath+ "jimmy.txt"));
+//            pw.close();
+//        } catch (FileNotFoundException e) {
+//            pw.close();
+//            throw new RuntimeException(e);
+//
+//        }
         scanner.close();
     }
     public static String setBibDirectory (Scanner scanner){
@@ -172,4 +173,5 @@ public class BibCreator {
         outputPath += "\\";
         return outputPath;
     }
+
 }
