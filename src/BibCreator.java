@@ -14,6 +14,7 @@ public class BibCreator {
         String dirPath;
         List<String> fileList;
         String[][] fileArr;
+        File[][] outputFiles;
 
         System.out.println("===================Welcome to BibCreator===================\n");
         Scanner scanner = new Scanner(System.in);
@@ -30,15 +31,20 @@ public class BibCreator {
         fileArr = new String[fileList.size()][3];
         splitBibFileName(fileList, fileArr);
 
-        for (String[] strings : fileArr) {
-            for (String string : strings) {
+        for (String[] strings : fileArr)
+        {
+            for (String string : strings)
+            {
                 System.out.print(string);
             }
             System.out.println();
         }
+
         //open all .bib files in directory
-        for (String[] strings : fileArr) {
-            try {
+        for (String[] strings : fileArr)
+        {
+            try
+            {
                 sc = new Scanner(new FileInputStream(dirPath +"/"+ strings[0] + strings[1] + strings[2]));
                 sc.close();
             }
@@ -50,7 +56,17 @@ public class BibCreator {
             }
         }
 
+        outputFiles = new File[fileArr.length][3];
         String outputPath = setOutputDirectory(scanner, dirPath);
+        createJsonFiles(fileArr, pw, outputPath, outputFiles);
+        try
+        {
+            Thread.sleep(3000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        deleteFiles (outputPath, outputFiles);
 
         //tests output path method
 //        try {
@@ -63,7 +79,8 @@ public class BibCreator {
 //        }
         scanner.close();
     }
-    public static String setBibDirectory (Scanner scanner){
+    public static String setBibDirectory (Scanner scanner)
+    {
         String dirPath;
         System.out.println("Working Directory for .bib files = " + System.getProperty("user.dir"));
 
@@ -80,7 +97,8 @@ public class BibCreator {
         }
         return dirPath;
     }
-    public static void getBibFiles(String dirPath, List<String> bibFileList) {
+    public static void getBibFiles(String dirPath, List<String> bibFileList)
+    {
         File[] allFiles = new File(dirPath).listFiles();
 
         if (allFiles != null) {
@@ -91,10 +109,12 @@ public class BibCreator {
             }
         }
     }
-    public static boolean endsWithIgnoreCase(String str, String suffix) {
+    public static boolean endsWithIgnoreCase(String str, String suffix)
+    {
         return endsWith(str, suffix, true);
     }
-    private static boolean endsWith(String str, String suffix, boolean ignoreCase) {
+    private static boolean endsWith(String str, String suffix, boolean ignoreCase)
+    {
         if (str == null || suffix == null) {
             return (str == null && suffix == null);
         }
@@ -104,10 +124,12 @@ public class BibCreator {
         int strOffset = str.length() - suffix.length();
         return str.regionMatches(ignoreCase, strOffset, suffix, 0, suffix.length());
     }
-    public static boolean startsWithIgnoreCase(String str, String prefix) {
+    public static boolean startsWithIgnoreCase(String str, String prefix)
+    {
         return str.regionMatches(true, 0, prefix, 0, prefix.length());
     }
-    public static void splitBibFileName(List<String> fileList, String[][] fileArr){
+    public static void splitBibFileName(List<String> fileList, String[][] fileArr)
+    {
 
         String start = "Latex";
         for (int i = 0; i < fileList.size(); i++) {
@@ -131,7 +153,8 @@ public class BibCreator {
             }
         }
     }
-    public static String setOutputDirectory (Scanner scanner, String dirPath){
+    public static String setOutputDirectory (Scanner scanner, String dirPath)
+    {
         String outputPath;
         System.out.println("Default Directory to save .json files = " + System.getProperty("user.dir"));
 
@@ -148,7 +171,8 @@ public class BibCreator {
                 outputPath = System.getProperty("user.dir");
             }
         }
-        else{
+        else
+        {
             System.out.print("Would you like to use the current .bib file directory at "+ dirPath + "? (y/n) ");
             char ans = scanner.next().toLowerCase().charAt(0);
             scanner.nextLine();
@@ -173,5 +197,47 @@ public class BibCreator {
         outputPath += "\\";
         return outputPath;
     }
-
+    public static void createJsonFiles (String[][] fileArr,PrintWriter pw, String outputPath, File[][] outputFiles)
+    {
+        String fileName = "";
+        for(int i = 0; i < fileArr.length; i++)
+        {
+            try {
+                fileName = "IEEE" + fileArr[i][1] + ".json";
+                outputFiles[i][0] = new File(outputPath + fileName);
+                pw = new PrintWriter(new FileOutputStream(outputPath + fileName));
+                pw.close();
+                fileName = "ACM" + fileArr[i][1] + ".json";
+                outputFiles[i][1] = new File(outputPath + fileName);
+                pw = new PrintWriter(new FileOutputStream(outputPath + fileName));
+                pw.close();
+                fileName = "NJ" + fileArr[i][1] + ".json";
+                outputFiles[i][2] = new File(outputPath + fileName);
+                pw = new PrintWriter(new FileOutputStream(outputPath + fileName));
+                pw.close();
+            }
+            catch (FileNotFoundException e)
+            {
+                System.out.println("Could not create " + fileName + " for " + fileArr[i][0] + fileArr[i][1] +fileArr[i][2] + ".\nClearing directory of all other created output files.");
+                pw.close();
+                //Deleting all opened/created files.
+                for (File[] outFile : outputFiles) {
+                    for (File file : outFile) {
+                        file.delete();
+                    }
+                }
+                //Exiting Program
+                System.exit(0);
+                //throw new RuntimeException(e);
+            }
+        }
+    }
+    public static void deleteFiles (String outputPath, File[][]outputFiles)
+    {
+        for (File[] outFile : outputFiles) {
+            for (File file : outFile) {
+                file.delete();
+            }
+        }
+    }
 }

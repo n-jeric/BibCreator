@@ -1,4 +1,4 @@
-
+import java.io.FileOutputStream;
 
 public class FileInvalidException extends Exception
 {
