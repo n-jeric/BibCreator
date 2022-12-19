@@ -86,9 +86,10 @@ public class BibCreator {
         }
         System.out.println("A total of " + invalid + " files were invalid, and could not be processed. All other " + (fileArr.length-invalid) + " valid files have been created.\n");
 
-
+        displayFile(scanner, outputPath);
 
         scanner.close();
+        System.out.println("Goodbye! Hope you enjoyed creating the needed files using BibCreator.");
     }
     public static String setBibDirectory (Scanner scanner){
         String dirPath;
@@ -247,8 +248,7 @@ public class BibCreator {
             }
         }
     }
-    public static String readFile(Scanner sc)
-    {
+    public static String readFile(Scanner sc){
         String str = "";
         while (sc.hasNextLine()) //While the file still has a next line and is not at END OF FILE
         {
@@ -342,6 +342,44 @@ public class BibCreator {
         pw = new PrintWriter(new FileOutputStream((outputFiles[i][2])));
         pw.println(nj);
         pw.close();
-
     }
+    public static void readBuffer(BufferedReader br, String fileName) throws IOException
+    {
+        System.out.println("Here are the contents of the successfully created .JSON file: " + fileName + "\n");
+        String str = br.readLine();
+        while (str != null)
+        {
+            System.out.println(str);
+            str = br.readLine();
+        }
+        br.close();
+    }
+    public static void displayFile(Scanner scanner, String outputPath){
+        int counter = 1;
+        BufferedReader br;
+        while(counter <= 2){
+            try{
+                System.out.print("Please enter the name of one of the files that you need to review: ");
+                String fileName = scanner.nextLine();
+                br = new BufferedReader(new FileReader(outputPath + fileName));
+                readBuffer(br, fileName);
+                return;
+            }
+            catch (IOException e) //'java.io.FileNotFoundException' is a subclass of 'java.io.IOException'
+            {
+                if(counter == 1){
+                    System.out.println("Could not open input file. File does not exist; possibly it could not be created!\n");
+                    System.out.println("However, you will be allowed another chance to enter another file name.\n");
+                }
+                else if(counter == 2){
+                    System.out.println("\nCould not open input file again! Either file does not exist, or could not be created.");
+                    System.out.println("Sorry! I am unable to display your desired files! Program will exit!");
+                    System.exit(0);
+                }
+                counter++;
+            }
+        }
+    }
+
+
 }
