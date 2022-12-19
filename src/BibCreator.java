@@ -268,8 +268,13 @@ public class BibCreator {
         StringBuilder acm = new StringBuilder();
         StringBuilder nj = new StringBuilder();
 
-
         String[] result = bibFile.split("@");
+//        Object[] res = Arrays.stream(bFile.toString().trim().split("@")).filter(s-> !s.equals("")).map(s -> s.trim()).toArray();
+//        String[] result = Arrays.stream(res).toArray(String[]::new);
+
+//        for (int x=0; x<result.length; x++){
+//            System.out.println(x + " " + result[x]);
+//        }
 
         String reg = "([a-zA-Z]*?)=\\{(.*?)\\}"; // a-z 0 or more times = any character 0 or more times
         Pattern regPattern = Pattern.compile(reg);
