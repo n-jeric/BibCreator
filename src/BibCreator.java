@@ -5,10 +5,7 @@
 * */
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,19 +29,19 @@ public class BibCreator {
         fileList = new ArrayList<>();
         getBibFiles(dirPath, fileList);
 
-        System.out.println(fileList);
+//        System.out.println(fileList);
 
         fileArr = new String[fileList.size()][3];
         splitBibFileName(fileList, fileArr);
 
-        for (String[] strings : fileArr)
-        {
-            for (String string : strings)
-            {
-                System.out.print(string);
-            }
-            System.out.println();
-        }
+//        for (String[] strings : fileArr)
+//        {
+//            for (String string : strings)
+//            {
+//                System.out.print(string + "*");
+//            }
+//            System.out.println();
+//        }
 
         //open all .bib files in directory
         for (String[] strings : fileArr)
@@ -250,12 +247,12 @@ public class BibCreator {
     }
     public static String readFile(Scanner sc){
         String str = "";
-        while (sc.hasNextLine()) //While the file still has a next line and is not at END OF FILE
+        while (sc.hasNextLine())
         {
-            str += sc.nextLine(); //add to the String
+            str += sc.nextLine();
         }
-        sc.close(); //Close Scanner
-        return str; //return the file
+        sc.close();
+        return str;
     }
     public static void processFilesForValidation (Scanner sc, PrintWriter pw, int i, File[][] outputFiles, String[][] fileArr) throws FileInvalidException, FileNotFoundException {
         String bFile = readFile(sc);
@@ -269,14 +266,19 @@ public class BibCreator {
         StringBuilder nj = new StringBuilder();
 
         String[] result = bibFile.split("@");
+//        String[] result = Arrays.stream(bFile.trim().split("@")).filter(s-> !s.equals("")).map(String::trim).toArray(String[]::new);
+//        String[] result = Arrays.stream(bFile.split("@")).filter(s-> !s.equals("")).toArray(String[]::new);
+        //not needed to convert from object to string as above adjusted method creates array of string to start with
 //        Object[] res = Arrays.stream(bFile.toString().trim().split("@")).filter(s-> !s.equals("")).map(s -> s.trim()).toArray();
-//        String[] result = Arrays.stream(res).toArray(String[]::new);
+//        String[] result = Arrays.stream(res).toArray(String[]::new); //convert array of objects to arr of string
 
+        //console printout of article split
 //        for (int x=0; x<result.length; x++){
 //            System.out.println(x + " " + result[x]);
 //        }
+//        System.out.println();
 
-        String reg = "([a-zA-Z]*?)=\\{(.*?)\\}"; // a-z 0 or more times = any character 0 or more times
+        String reg = "([a-zA-Z]*?)=\\{(.*?)\\}"; // a-z 0 or more times = any character 0 or more times in {}
         Pattern regPattern = Pattern.compile(reg);
 
         for (int x = 0; x < result.length; x++) {
@@ -285,19 +287,25 @@ public class BibCreator {
             while(match.find()){
                 String field = match.group();
                 String[] fields = field.split("=");
-                if(fields[1].charAt(0)=='{' && fields[1].charAt(1)=='}'){
+
+                String emptyReg = "\\{(\\s*)\\}"; // whitespace 0 or more times between {}
+                Pattern emptyPattern = Pattern.compile(emptyReg);
+                Matcher emptyMatch = emptyPattern.matcher(fields[1]);
+
+                if(emptyMatch.find()){
                     invalid++;
                     deleteFiles(outputFiles, i);
                     throw new FileInvalidException("Error: Detected Empty Field!\n"
-                                                    +"============================\n\n"
-                                                    +"Problem detected with input file: " + fileArr[i][0] + fileArr[i][1] + fileArr[i][2] + "\n"
-                                                    +"File is Invalid: Field \"" + fields[0] + "\" is Empty. Processing stopped at this point. Other empty fields may be present as well!\n");
+                            +"============================\n\n"
+                            +"Problem detected with input file: " + fileArr[i][0] + fileArr[i][1] + fileArr[i][2] + "\n"
+                            +"File is Invalid: Field \"" + fields[0] + "\" is Empty. Processing stopped at this point. Other empty fields may be present as well!\n");
                 }
+
                 String entry = fields[1].substring(1,fields[1].indexOf('}')); //takes the value of fields[1] from { to }
                 switch (fields[0]) {
                     case "author" ->
-                            // authors = entry.split(" and ");
-                            authors = Arrays.stream(entry.split("and")).map(String::trim).toArray(String[]::new); //Stream features
+                            authors = entry.split(" and ");
+                            //authors = Arrays.stream(entry.split("and")).map(String::trim).toArray(String[]::new); //Stream features -> not right result
                     case "journal" ->
                             journal = entry;
                     case "title" ->
@@ -334,7 +342,7 @@ public class BibCreator {
                 nj.append(authors[k]).append(" & ");
             }
             nj.append(authors[authors.length - 1]).append(". ").append(title).append(". ").append(journal).append(". ").append(volume).append(", ").append(pages).append("(").append(year).append(").\n\n");
-        }
+        }//end for loop result[x]
 
         pw = new PrintWriter(new FileOutputStream(outputFiles[i][0]));
         pw.println(ieee);
